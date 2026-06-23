@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Senga</title>
+<style>
+  :root{
+    --bg-deep:#fff5f8;
+    --bg-mid:#ffe3ed;
+    --neon-pink:#ff6fa5;
+    --neon-cyan:#ffffff;
+    --neon-violet:#ffb6cf;
+    --soft-white:#3d2233;
+    --muted:#8a6275;
+    --line:#3d2233;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; overflow-x:hidden;}
+  body{
+    font-family:-apple-system,'Helvetica Neue',sans-serif;
+    background:linear-gradient(-45deg, #ffd6e8, #ffe9f0, #ffc2dd, #fff0f5, #ffb8d4);
+    background-size:400% 400%;
+    animation:gradientShift 14s ease infinite;
+    color:var(--soft-white);
+    min-height:100vh;
+    position:relative;
+  }
+  @keyframes gradientShift{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+
+  /* soft drifting petals instead of stars, since the palette is now light */
+  .star{
+    position:fixed;
+    border-radius:50%;
+    background:#ffffff;
+    border:1px solid rgba(255,111,165,0.4);
+    opacity:0.7;
+    z-index:0;
+    animation:twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:0.25;}
+    50%{opacity:0.9;}
+  }
+
+  .glow{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(55px);
+    z-index:0;
+    opacity:0.55;
+    animation:drift 12s ease-in-out infinite;
+  }
+  .glow1{width:270px;height:270px;background:#ff7eb3;top:-80px;left:-60px;}
+  .glow2{width:230px;height:230px;background:#ffa3c9;bottom:-60px;right:-60px;animation-delay:3s;}
+  .glow3{width:210px;height:210px;background:#ffd1e0;top:45%;left:60%;animation-delay:6s;}
+  @keyframes drift{
+    0%,100%{transform:translate(0,0);}
+    50%{transform:translate(20px,-25px);}
+  }
+
+  /* Rewind motif: time turning backward, since the whole page is about wanting a moment back */
+  .rewind{
+    position:relative;
+    width:104px;
+    height:104px;
+    margin:4px auto 22px;
+  }
+  .rewind svg{
+    width:100%;
+    height:100%;
+    animation:rewindSpin 10s linear infinite reverse;
+  }
+  .rewind-ring{
+    fill:none;
+    stroke:url(#ringGrad);
+    stroke-width:1.3;
+    stroke-dasharray:3 8;
+    opacity:0.85;
+  }
+  @keyframes rewindSpin{
+    100%{transform:rotate(360deg);}
+  }
+  .rewind-core{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    font-size:21px;
+    animation:corePulse 2.6s ease-in-out infinite;
+  }
+  @keyframes corePulse{
+    0%,100%{opacity:0.65; filter:drop-shadow(0 0 6px rgba(255,111,165,0.4));}
+    50%{opacity:1; filter:drop-shadow(0 0 14px rgba(255,111,165,0.7));}
+  }
+
+  .wrap{
+    position:relative;
+    z-index:2;
+    max-width:480px;
+    margin:0 auto;
+    padding:36px 24px 60px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+
+  .stage{display:none;}
+  .stage.active{display:flex; flex-direction:column; align-items:center; width:100%;}
+
+  @keyframes rise{
+    0%{opacity:0; transform:translateY(16px);}
+    100%{opacity:1; transform:translateY(0);}
+  }
+  .in{animation:rise 0.7s ease both;}
+
+  .progress-dots{
+    display:flex;
+    gap:7px;
+    margin-bottom:26px;
+  }
+  .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:rgba(255,255,255,0.18);
+    transition:background 0.3s;
+  }
+  .dot.on{background:#ff5c93; box-shadow:0 0 8px rgba(255,92,147,0.6);}
+
+  .mark{
+    width:46px; height:46px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.25);
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px;
+    margin-bottom:22px;
+    box-shadow:0 0 18px rgba(159,123,255,0.4);
+  }
+
+  h1{
+    font-size:25px;
+    line-height:1.35;
+    margin:0 0 14px;
+    font-weight:600;
+    letter-spacing:0.2px;
+  }
+  .accent{
+    color:var(--neon-pink);
+    text-shadow:0 0 14px rgba(255,111,165,0.35);
+  }
+  .accent-cyan{
+    color:#c9447a;
+    text-shadow:0 0 14px rgba(201,68,122,0.3);
+  }
+
+  p.lead{
+    font-size:15.5px;
+    line-height:1.65;
+    color:var(--muted);
+    margin:0 0 30px;
+    max-width:340px;
+  }
+
+  .panel{
+    background:rgba(255,255,255,0.7);
+    border:1px solid rgba(255,111,165,0.25);
+    border-radius:18px;
+    padding:22px 20px;
+    width:100%;
+    margin-bottom:16px;
+    text-align:left;
+    backdrop-filter:blur(6px);
+    box-shadow:0 8px 24px rgba(255,111,165,0.12);
+  }
+  .panel p{
+    font-size:15px;
+    line-height:1.7;
+    color:#4a2c3c;
+    margin:0;
+  }
+
+  .reel-card{
+    display:block;
+    text-decoration:none;
+    cursor:pointer;
+    transition:transform 0.15s;
+    border:1px solid rgba(255,92,147,0.35);
+  }
+  .reel-card:active{
+    transform:scale(0.98);
+  }
+  .reel-card .tag{
+    color:#ff5c93;
+  }
+  .tag{
+    display:block;
+    font-size:11px;
+    letter-spacing:1.5px;
+    color:#c9447a;
+    text-transform:uppercase;
+    margin-bottom:10px;
+    opacity:0.9;
+  }
+
+  .btn{
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    font-weight:600;
+    font-size:16px;
+    padding:15px 26px;
+    border-radius:14px;
+    color:#ffffff;
+    background:linear-gradient(135deg,#ff7eb3,#ff5c93);
+    box-shadow:0 10px 24px rgba(255,92,147,0.35);
+    margin-top:8px;
+    width:100%;
+    max-width:300px;
+    transition:transform 0.15s, box-shadow 0.15s;
+    display:inline-block;
+    text-decoration:none;
+    text-align:center;
+  }
+  .btn:active{
+    transform:scale(0.97);
+    box-shadow:0 4px 14px rgba(255,92,147,0.3);
+  }
+
+  .btn.outline{
+    background:transparent;
+    color:#4a2c3c;
+    border:1px solid rgba(74,44,60,0.25);
+    box-shadow:none;
+    margin-top:14px;
+  }
+  .btn.outline:active{
+    background:rgba(255,111,165,0.08);
+  }
+
+  .choice-row{
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    margin-top:6px;
+  }
+
+  .big-mark{
+    font-size:42px;
+    margin-bottom:18px;
+    filter:drop-shadow(0 0 18px rgba(255,95,212,0.5));
+  }
+
+  .signature{
+    margin-top:34px;
+    font-size:12px;
+    color:rgba(138,98,117,0.7);
+    letter-spacing:0.5px;
+  }
+
+  .divider{
+    width:36px;
+    height:1px;
+    background:linear-gradient(90deg,transparent,#ff5c93,transparent);
+    margin:4px 0 22px;
+    opacity:0.6;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;}
+  }
+
+  /* Heart finale: falling pink hearts triggered on the "yes" outcome */
+  .heart-fall{
+    position:fixed;
+    top:-10vh;
+    z-index:5;
+    pointer-events:none;
+    animation:heartFall linear forwards;
+  }
+  @keyframes heartFall{
+    0%{transform:translateY(0) rotate(0deg); opacity:0;}
+    8%{opacity:1;}
+    100%{transform:translateY(115vh) rotate(360deg); opacity:0.9;}
+  }
+  .finale-burst{
+    font-size:54px;
+    animation:burstPop 0.8s cubic-bezier(.17,.89,.32,1.4) both;
+  }
+  @keyframes burstPop{
+    0%{opacity:0; transform:scale(0.3);}
+    60%{opacity:1; transform:scale(1.25);}
+    100%{opacity:1; transform:scale(1);}
+  }
+</style>
+</head>
+<body>
+
+<div class="glow glow1"></div>
+<div class="glow glow2"></div>
+<div class="glow glow3"></div>
+<div id="stars"></div>
+
+<div class="wrap">
+
+  <!-- STAGE 1 -->
+  <div class="stage active" id="stage1">
+    <div class="progress-dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="rewind in">
+      <svg viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff5c93"/>
+            <stop offset="100%" stop-color="#ffb6cf"/>
+          </linearGradient>
+        </defs>
+        <circle class="rewind-ring" cx="50" cy="50" r="42"/>
+      </svg>
+      <div class="rewind-core">↺</div>
+    </div>
+    <h1 class="in">Vaqtni qaytarib bo'lmaydi, <span class="accent">lekin gapni aytib bo'ladi</span></h1>
+    <p class="lead in">Bu faqat senga yozilgan. Boshqa hech kim ko'rmaydi. O'qib chiq — qolgani senga bog'liq.</p>
+    <button class="btn in" onclick="goTo(2)">Davom etish</button>
+  </div>
+
+  <!-- STAGE 2 -->
+  <div class="stage" id="stage2">
+    <div class="progress-dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+    <div class="panel in">
+      <span class="tag">Esda qolgani</span>
+      <p>Kulganingni eslayman. Hafa bo'lib jim qolganingni ham. Janjallashganimizni, keyin yana yarashganimizni. Tunlari gaplashib, hech narsa yashirmagan paytlarimizni. Sochlaringni, ko'zlaringga qaraganda his qilganlarimni. Kuningiz qanday o'tganini so'rashni, qiziqarli lahzalaringni eshitishni, ovozingni tinglashni sog'indim — bularning hech biri esimdan chiqmadi.</p>
+    </div>
+
+    <div class="panel in" style="animation-delay:0.15s">
+      <span class="tag">Aniq aytsam</span>
+      <p>Vaqtni qaytarib bo'lmasligini bilaman. Sendan biror narsa so'ramayman va yalinmayman — bu menga yot. Faqat shuni aytaman: men hali ham yoningdaman, qayerda bo'lsang ham, qanday bo'lsang ham.</p>
+    </div>
+
+    <a class="panel in reel-card" style="animation-delay:0.2s" href="https://www.instagram.com/reel/DZ4fRBciEUp/?igsh=aDA1M2YwdjhieHM0" target="_blank" rel="noopener">
+      <span class="tag">Buni ham ko'r</span>
+      <p>Sen bilan bo'lganimda menda nima bo'ladi — buni bos. ↗</p>
+    </a>
+    <button class="btn in" onclick="goTo(3)" style="animation-delay:0.3s">Davom etish</button>
+  </div>
+
+  <!-- STAGE 3 -->
+  <div class="stage" id="stage3">
+    <div class="progress-dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div>
+    <div class="rewind in">
+      <svg viewBox="0 0 100 100">
+        <circle class="rewind-ring" cx="50" cy="50" r="42"/>
+      </svg>
+      <div class="rewind-core">↺</div>
+    </div>
+    <h1 class="in" style="text-align:center;">Men yoningdaman. Sen ham yonimda bo'lasanmi, har doim?</h1>
+    <p class="lead in" style="text-align:center; margin-left:auto; margin-right:auto;">Bilaman, ko'nglingda javob bor. Bu so'rov qo'rquvdan emas — munosabatni saqlab qolish istagidan.</p>
+
+    <div class="choice-row">
+      <a class="btn in" id="yesLink" href="#" target="_blank" rel="noopener">Ha, har doim</a>
+      <a class="btn outline in" id="noLink" href="#" target="_blank" rel="noopener">Yo'q, hozircha emas</a>
+    </div>
+  </div>
+
+  <!-- STAGE 4a -->
+  <div class="stage" id="stageYes">
+    <div class="finale-burst in">💗</div>
+    <h1 class="in">Rahmat senga.</h1>
+    <div class="divider"></div>
+    <p class="lead in">Telegram ochildi — xabarni yuborish qoldi. Qolganini shoshilmasdan gaplashamiz.</p>
+  </div>
+
+  <!-- STAGE 4b -->
+  <div class="stage" id="stageNo">
+    <div class="rewind in">
+      <svg viewBox="0 0 100 100">
+        <circle class="rewind-ring" cx="50" cy="50" r="42"/>
+      </svg>
+      <div class="rewind-core">↺</div>
+    </div>
+    <h1 class="in">Tushunarli.</h1>
+    <div class="divider"></div>
+    <p class="lead in">Telegram ochildi — bu ham bir javob. Vaqt kerak bo'lsa, vaqt beraman.</p>
+  </div>
+
+  <div class="signature">∗</div>
+</div>
+
+<script>
+  function showStage(id){
+    document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+  function goTo(n){ showStage('stage'+n); }
+
+  // Telegram handoff: each choice opens a prefilled chat to @kosimovj, then shows the matching result screen
+  const TELEGRAM_USERNAME = 'kosimovj';
+  function telegramLink(text){
+    return 'https://t.me/' + TELEGRAM_USERNAME + '?text=' + encodeURIComponent(text);
+  }
+  document.getElementById('yesLink').href = telegramLink("Ha, har doim — sahifani ko'rdim, javobim shu.");
+  document.getElementById('noLink').href = telegramLink("Sahifani ko'rdim, lekin hozircha emas.");
+
+  document.getElementById('yesLink').addEventListener('click', function(){
+    setTimeout(function(){
+      showStage('stageYes');
+      rainHearts(34);
+    }, 300);
+  });
+  document.getElementById('noLink').addEventListener('click', function(){
+    setTimeout(function(){ showStage('stageNo'); }, 300);
+  });
+
+  // Falling pink hearts for the celebratory finale
+  function rainHearts(count){
+    const hearts = ['💗','💕','💖','🩷'];
+    for(let i=0;i<count;i++){
+      const h = document.createElement('div');
+      h.className = 'heart-fall';
+      h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+      h.style.left = Math.random()*100+'vw';
+      h.style.fontSize = (16+Math.random()*18)+'px';
+      h.style.animationDuration = (3+Math.random()*2.5)+'s';
+      h.style.animationDelay = (Math.random()*1.2)+'s';
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(), 7000);
+    }
+  }
+
+  // generate stars
+  (function(){
+    const layer = document.getElementById('stars');
+    const count = 50;
+    for(let i=0;i<count;i++){
+      const s = document.createElement('div');
+      s.className = 'star';
+      const size = (Math.random()*2+1).toFixed(1);
+      s.style.width = size+'px';
+      s.style.height = size+'px';
+      s.style.left = Math.random()*100+'vw';
+      s.style.top = Math.random()*100+'vh';
+      s.style.animationDelay = (Math.random()*3)+'s';
+      s.style.animationDuration = (2+Math.random()*3)+'s';
+      layer.appendChild(s);
+    }
+  })();
+</script>
+
+</body>
+</html>
